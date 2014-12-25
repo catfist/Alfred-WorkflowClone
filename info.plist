@@ -88,16 +88,18 @@
 				<key>escaping</key>
 				<integer>127</integer>
 				<key>script</key>
-				<string>theUrl="$(osascript &lt;&lt; EOB
+				<string>wfdir=~/Library/Application\ Support/Alfred\ 2/Alfred.alfredpreferences/workflows
+
+theUrl="$(osascript &lt;&lt; EOB
 tell application "Safari"
   get URL of document 1
 end tell
 EOB)"
 
 if [ $(echo "$theUrl" | grep 'github.com') ];then
-  repo=$(echo "$theUrl" | gsed 's%^https://github.com/\([^/]*/[^/]*\)/*.*$%\1%')
-  name=$(echo "$theUrl" | gsed 's%^https://github.com/[^/]*/\([^/]*\)/*.*$%\1%')
-  git clone git@github.com:$repo.git ~/Dropbox/setting/Alfred.alfredpreferences/workflows/$name &amp;&amp; echo "cloned $repo"
+  repo=$(echo "$theUrl" | sed 's%^https://github.com/\([^/]*/[^/]*\)/*.*$%\1%')
+  name=$(echo "$theUrl" | sed 's%^https://github.com/[^/]*/\([^/]*\)/*.*$%\1%')
+  git clone git@github.com:$repo.git "$wfdir/$name" &amp;&amp; echo "cloned $repo"
 else
   echo "Not Github repository"
 fi
