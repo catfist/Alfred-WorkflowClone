@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>bundleid</key>
-	<string>com.catfist.githubclone</string>
+	<string>com.alfredapp.catfist.githubclone</string>
 	<key>category</key>
 	<string>Tools</string>
 	<key>connections</key>
@@ -85,38 +85,6 @@
 		<dict>
 			<key>config</key>
 			<dict>
-				<key>escaping</key>
-				<integer>127</integer>
-				<key>script</key>
-				<string>wfdir=~/Library/Application\ Support/Alfred\ 2/Alfred.alfredpreferences/workflows
-
-theUrl="$(osascript &lt;&lt; EOB
-tell application "Safari"
-  get URL of document 1
-end tell
-EOB)"
-
-if [ $(echo "$theUrl" | grep 'github.com') ];then
-  repo=$(echo "$theUrl" | sed 's%^https://github.com/\([^/]*/[^/]*\)/*.*$%\1%')
-  name=$(echo "$theUrl" | sed 's%^https://github.com/[^/]*/\([^/]*\)/*.*$%\1%')
-  git clone git@github.com:$repo.git "$wfdir/$name" &amp;&amp; echo "cloned $repo"
-else
-  echo "Not Github repository"
-fi
-</string>
-				<key>type</key>
-				<integer>0</integer>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.action.script</string>
-			<key>uid</key>
-			<string>FF316160-82F1-4AC1-8D82-72A1F0AC9ED6</string>
-			<key>version</key>
-			<integer>0</integer>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
 				<key>lastpathcomponent</key>
 				<false/>
 				<key>onlyshowifquerypopulated</key>
@@ -145,15 +113,55 @@ fi
 				<key>escaping</key>
 				<integer>127</integer>
 				<key>script</key>
-				<string>PATH="$PATH:/usr/local/bin
+				<string>wfdir=~/Dropbox/setting/Alfred.alfredpreferences/workflows
+
+if [ "$(pbpaste | grep '^https://github.com/[^/]*/[^/]*')" ];then
+theUrl="$(pbpaste)"
+else
 theUrl="$(osascript &lt;&lt; EOB
 tell application "Safari"
   get URL of document 1
 end tell
 EOB)"
+fi
 
 if [ $(echo "$theUrl" | grep 'github.com') ];then
-  ghq get $theUrl &amp;&amp; echo "cloned in $(ghqroot)/github.com/$(echo "$theUrl" | gsed 's%^https://github.com/\([^/]*/[^/]*\)/*.*$%\1%')/}"
+  repo=$(echo "$theUrl" | sed 's%^https://github.com/\([^/]*/[^/]*\)/*.*$%\1%')
+  name=$(echo "$theUrl" | sed 's%^https://github.com/[^/]*/\([^/]*\)/*.*$%\1%')
+  git clone git@github.com:$repo.git "$wfdir/$name" &amp;&amp; echo "cloned $repo" || echo error
+else
+  echo "Not Github repository"
+fi</string>
+				<key>type</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>FF316160-82F1-4AC1-8D82-72A1F0AC9ED6</string>
+			<key>version</key>
+			<integer>0</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>escaping</key>
+				<integer>127</integer>
+				<key>script</key>
+				<string>PATH="$PATH:/usr/local/bin"
+
+if [ "$(pbpaste | grep '^https://github.com/[^/]*/[^/]*')" ];then
+theUrl="$(pbpaste)"
+else
+theUrl="$(osascript &lt;&lt; EOB
+tell application "Safari"
+  get URL of document 1
+end tell
+EOB)"
+fi
+
+if [ $(echo "$theUrl" | grep 'github.com') ];then
+  ghq get $theUrl &amp;&amp; echo "cloned in $(ghqroot)/github.com/$(echo "$theUrl" | gsed 's%^https://github.com/\([^/]*/[^/]*\)/*.*$%\1%')/}" || echo error
 else
   echo "Not Github repository"
 fi
