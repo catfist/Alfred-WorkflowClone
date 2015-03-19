@@ -30,6 +30,28 @@
 				<string></string>
 			</dict>
 		</array>
+		<key>3F77BD6B-8BFD-420A-A5F7-B143E333065E</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>A70A4E1E-712E-4575-967A-0AA64960904D</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+			</dict>
+		</array>
+		<key>FD0F927D-E2BD-42A2-96ED-7E5F214F3C14</key>
+		<array>
+			<dict>
+				<key>destinationuid</key>
+				<string>3F77BD6B-8BFD-420A-A5F7-B143E333065E</string>
+				<key>modifiers</key>
+				<integer>0</integer>
+				<key>modifiersubtext</key>
+				<string></string>
+			</dict>
+		</array>
 		<key>FDAB4F6C-D86F-4B04-A824-23B56B297CE9</key>
 		<array>
 			<dict>
@@ -63,6 +85,47 @@
 	<string>Clone from Github</string>
 	<key>objects</key>
 	<array>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>escaping</key>
+				<integer>127</integer>
+				<key>script</key>
+				<string>
+readonly wfdir=~/Dropbox/setting/Alfred.alfredpreferences/workflows
+repo=""
+name=""
+theUrl=""
+alias ifrepo="grep -om1 '[0-9a-zA-Z\-]\+/[0-9a-zA-Z\-]\+'"
+osascript -e 'tell application "Alfred 2" to launch' &gt;&amp;/dev/null || echo "ERROR: Alfred 2 is not installed."; exit 1
+{ 
+  repo="$(echo "{query}" | ifrepo)"
+} || {
+  repo="$(pbpaste | ifrepo)"
+} &amp;&amp; {
+  theUrl="$(echo "$repo" | sed 's@^@https://github.com/@g')"
+  name=$(echo "$repo" | sed 's%^[^/]*/\([^/]*\).*$%\1%')
+} || {
+  theUrl="$(osascript -e 'tell application "Safari" to get URL of document 1' | grep -o 'https://github.com/[0-9a-zA-Z\-]\+/[0-9a-zA-Z\-]\+')"
+  repo="$(echo "$theUrl" | sed 's%^https://github.com/\([^/]*/[^/]*\)/*.*$%\1%')"
+  name="$(echo "$repo" | sed 's%^[^/]*/\([^/]*\).*$%\1%')"
+} &amp;&amp; {
+  git clone "git@github.com:$repo.git" "$wfdir/$name" &amp;&amp; echo "cloned $repo" || echo "ERROR: clone from $theUrl is failed."
+} || {
+  echo "ERROR: No Github repo name or URL."
+  exit 1
+}
+</string>
+				<key>type</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>FF316160-82F1-4AC1-8D82-72A1F0AC9ED6</string>
+			<key>version</key>
+			<integer>0</integer>
+		</dict>
 		<dict>
 			<key>config</key>
 			<dict>
@@ -113,58 +176,31 @@
 				<key>escaping</key>
 				<integer>127</integer>
 				<key>script</key>
-				<string>wfdir=~/Dropbox/setting/Alfred.alfredpreferences/workflows
-
-if [ "$(pbpaste | grep '^https://github.com/[^/]*/[^/]*')" ];then
-theUrl="$(pbpaste)"
-else
-theUrl="$(osascript &lt;&lt; EOB
-tell application "Safari"
-  get URL of document 1
-end tell
-EOB)"
-fi
-
-if [ $(echo "$theUrl" | grep 'github.com') ];then
-  repo=$(echo "$theUrl" | sed 's%^https://github.com/\([^/]*/[^/]*\)/*.*$%\1%')
-  name=$(echo "$theUrl" | sed 's%^https://github.com/[^/]*/\([^/]*\)/*.*$%\1%')
-  git clone git@github.com:$repo.git "$wfdir/$name" &amp;&amp; echo "cloned $repo" || echo error
-else
-  echo "Not Github repository"
-fi</string>
-				<key>type</key>
-				<integer>0</integer>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.action.script</string>
-			<key>uid</key>
-			<string>FF316160-82F1-4AC1-8D82-72A1F0AC9ED6</string>
-			<key>version</key>
-			<integer>0</integer>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
-				<key>escaping</key>
-				<integer>127</integer>
-				<key>script</key>
-				<string>PATH="$PATH:/usr/local/bin"
-
-if [ "$(pbpaste | grep '^https://github.com/[^/]*/[^/]*')" ];then
-theUrl="$(pbpaste)"
-else
-theUrl="$(osascript &lt;&lt; EOB
-tell application "Safari"
-  get URL of document 1
-end tell
-EOB)"
-fi
-
-if [ $(echo "$theUrl" | grep 'github.com') ];then
-  ghq get $theUrl &amp;&amp; echo "cloned in $(ghqroot)/github.com/$(echo "$theUrl" | gsed 's%^https://github.com/\([^/]*/[^/]*\)/*.*$%\1%')/}" || echo error
-else
-  echo "Not Github repository"
-fi
+				<string>
+PATH="$PATH:/usr/local/bin"
+type ghq &gt;&amp; /dev/null || echo "ERROR: ghq is not found."; exit 1
+readonly wfdir=~/Dropbox/setting/Alfred.alfredpreferences/workflows
+repo=""
+name=""
+theUrl=""
+alias ifrepo="grep -om1 '[0-9a-zA-Z\-]\+/[0-9a-zA-Z\-]\+'"
+{ 
+  repo="$(echo "{query}" | ifrepo)"
+} || {
+  repo="$(pbpaste | ifrepo)"
+} &amp;&amp; {
+  theUrl="$(echo "$repo" | sed 's@^@https://github.com/@g')"
+  name=$(echo "$repo" | sed 's%^[^/]*/\([^/]*\).*$%\1%')
+} || {
+  theUrl="$(osascript -e 'tell application "Safari" to get URL of document 1' | grep -o 'https://github.com/[0-9a-zA-Z\-]\+/[0-9a-zA-Z\-]\+')"
+  repo="$(echo "$theUrl" | sed 's%^https://github.com/\([^/]*/[^/]*\)/*.*$%\1%')"
+  name="$(echo "$repo" | sed 's%^[^/]*/\([^/]*\).*$%\1%')"
+} &amp;&amp; {
+ghq get "$repo" &gt;&amp; /dev/null &amp;&amp; echo "cloned in $(ghq root)/$repo" || echo "ERROR: clone from $theUrl is failed."
+} || {
+  echo "ERROR: No Github repo name or URL."
+  exit 1
+}
 </string>
 				<key>type</key>
 				<integer>0</integer>
@@ -195,6 +231,63 @@ fi
 			<key>version</key>
 			<integer>0</integer>
 		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>escaping</key>
+				<integer>127</integer>
+				<key>script</key>
+				<string>
+readonly PATH="$PATH:/usr/local/bin"
+readonly vim_plugin=~/.vim/conf/bundle-init-pluginlist.vim
+alias ifnb="grep -o 'NeoBundle '\''[0-9a-zA-Z\-]\+/[0-9a-zA-Z\-]\+'\''' | tee \"$vim_plugin\" | xargs -n 1 echo \"Added Bundle: \""
+alias ifgh="grep -o 'https://github.com/[0-9a-zA-Z\-]\+/[0-9a-zA-Z\-]\+' | sed 's%https://github.com/\([0-9a-zA-Z\-]\+/[0-9a-zA-Z\-]\+\).*%\1%' | tee \"$vim_plugin\" | xargs -n 1 echo \"Added Bundle: \""
+{
+  echo "{query}" | ifnb
+} || {
+  echo "{query}" | ifgh
+} || {
+  pbpaste | ifnb
+} || {
+  pbpaste | ifgh
+} || {
+  osascript -e 'tell application "Safari" to get URL of document 1' | ifgh
+} &amp;&amp; {
+  mvim +"NeoBundleCheck" "$vim_plugin" &gt;&amp;/dev/null
+} || {
+  echo "ERROR: No Github repo name or URL."
+  mvim +$ +"a|NeoBundle ''" +"normal $" &gt;&amp;/dev/null
+}
+</string>
+				<key>type</key>
+				<integer>0</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>3F77BD6B-8BFD-420A-A5F7-B143E333065E</string>
+			<key>version</key>
+			<integer>0</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>argumenttype</key>
+				<integer>1</integer>
+				<key>keyword</key>
+				<string>neoclone</string>
+				<key>text</key>
+				<string>Add to NeoBundle from Github</string>
+				<key>withspace</key>
+				<true/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.keyword</string>
+			<key>uid</key>
+			<string>FD0F927D-E2BD-42A2-96ED-7E5F214F3C14</string>
+			<key>version</key>
+			<integer>0</integer>
+		</dict>
 	</array>
 	<key>readme</key>
 	<string>Clone Alfred Workflow (or other Repositories to ghq root directory)</string>
@@ -210,10 +303,20 @@ fi
 			<key>ypos</key>
 			<real>180</real>
 		</dict>
+		<key>3F77BD6B-8BFD-420A-A5F7-B143E333065E</key>
+		<dict>
+			<key>ypos</key>
+			<real>300</real>
+		</dict>
 		<key>A70A4E1E-712E-4575-967A-0AA64960904D</key>
 		<dict>
 			<key>ypos</key>
-			<real>60</real>
+			<real>180</real>
+		</dict>
+		<key>FD0F927D-E2BD-42A2-96ED-7E5F214F3C14</key>
+		<dict>
+			<key>ypos</key>
+			<real>300</real>
 		</dict>
 		<key>FDAB4F6C-D86F-4B04-A824-23B56B297CE9</key>
 		<dict>
